@@ -57,8 +57,14 @@ const Home = async () => {
     `).join('');
 
     return `
-        <section class="hero" style="text-align: center; padding-bottom: 2rem; padding-top: 0;">
+        <section class="hero" style="text-align: center; padding-bottom: 2rem; padding-top: 1rem;">
             
+            <div style="margin-bottom: 1rem;">
+                <h1 style="margin: 0; display: inline-block; font-size: 1.5rem; color: var(--color-text-primary);">Welcome to Nutanaa Store</h1>
+                <span style="margin: 0 0.5rem; color: var(--color-text-secondary);">|</span>
+                <p style="margin: 0; display: inline-block; color: var(--color-text-secondary); font-size: 1.1rem;">Premium products curated for modern living.</p>
+            </div>
+
             <!-- Slider Component -->
             <div class="carousel-container">
                 <div class="carousel-track" id="carousel-track">
@@ -69,20 +75,13 @@ const Home = async () => {
             </div>
 
             <div style="padding: 0 1rem;">
-                <h1 style="margin-top: 1rem; margin-bottom: 0.5rem;">Welcome to Nutanaa Store</h1>
-                <p style="margin-bottom: 1.5rem; color: var(--color-text-secondary); font-size: 1.1rem;">Premium products curated for modern living.</p>
                 
-                <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 3rem;">
-                    <button class="btn" onclick="window.location.hash='#/products'">Shop Collection</button>
-                    <button class="btn" style="background: white; color: var(--color-accent); border: 1px solid var(--color-accent);" onclick="window.location.hash='#/contact'">Contact Us</button>
-                </div>
-
                 <!-- Most Purchased Products Section -->
-                <div style="margin-bottom: 4rem;">
-                    <h2 style="margin-bottom: 2rem; font-size: 1.8rem; color: var(--color-text-primary);">Most Purchased</h2>
+                <div style="margin-bottom: 3rem; margin-top: 3rem;">
+                    <h2 style="margin-bottom: 1.5rem; font-size: 1.8rem; color: var(--color-text-primary);">Most Purchased</h2>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: left;">
                         ${products.slice(0, 4).map(p => `
-                            <div class="card product-card" style="transition: transform 0.2s; cursor: pointer;" onclick="window.location.hash='#/product/${p.id}'">
+                            <div class="card product-card" style="transition: transform 0.2s; cursor: pointer;" onclick="window.scrollTo(0,0); window.location.hash='#/product/${p.id}'">
                                 <div style="aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 1rem;">
                                     <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
                                 </div>
@@ -91,11 +90,17 @@ const Home = async () => {
                             </div>
                         `).join('')}
                     </div>
-                    <div style="margin-top: 2rem; text-align: center;">
-                        <a href="#/products" style="color: var(--color-accent); font-weight: 500; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.borderBottomColor='var(--color-accent)'" onmouseout="this.style.borderBottomColor='transparent'">
-                            For more products click here →
-                        </a>
-                    </div>
+                </div>
+
+                <div style="margin-bottom: 3rem; text-align: center;">
+                    <a href="#/products" style="color: var(--color-accent); font-weight: 500; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.borderBottomColor='var(--color-accent)'" onmouseout="this.style.borderBottomColor='transparent'">
+                        For more products click here →
+                    </a>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 4rem;">
+                    <button class="btn" onclick="window.scrollTo(0,0); window.location.hash='#/products'">Shop Collection</button>
+                    <button class="btn" style="background: white; color: var(--color-accent); border: 1px solid var(--color-accent);" onclick="window.scrollTo(0,0); window.location.hash='#/contact'">Contact Us</button>
                 </div>
 
                 <!-- Franchise Opportunity Section -->

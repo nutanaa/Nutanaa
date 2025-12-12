@@ -38,6 +38,14 @@ const Router = {
         if (!window.location.hash) {
             window.location.hash = '#/';
         }
+
+        // Global link click interceptor for Scroll to Top on Forward Nav
+        window.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link && link.getAttribute('href')?.startsWith('#/')) {
+                window.scrollTo(0, 0);
+            }
+        });
     },
 
     async handleRoute() {
