@@ -39,7 +39,7 @@ const renderHeader = () => {
             
             <div style="display: flex; gap: 1.5rem; align-items: center;">
                 <a href="#/cart" style="position: relative; color: var(--color-text-primary); text-decoration: none; display: flex; align-items: center;">
-                    <span style="font-size: 1.25rem;">🛍️</span> 
+                    <span style="font-size: 1.25rem;">🛒</span> 
                     ${cartCount > 0 ? `<span style="position: absolute; top: -8px; right: -8px; background: var(--color-accent); color: white; font-size: 0.7rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${cartCount}</span>` : ''}
                 </a>
                 ${user ?
