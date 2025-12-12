@@ -77,6 +77,27 @@ const Home = async () => {
                     <button class="btn" style="background: white; color: var(--color-accent); border: 1px solid var(--color-accent);" onclick="window.location.hash='#/contact'">Contact Us</button>
                 </div>
 
+                <!-- Most Purchased Products Section -->
+                <div style="margin-bottom: 4rem;">
+                    <h2 style="margin-bottom: 2rem; font-size: 1.8rem; color: var(--color-text-primary);">Most Purchased</h2>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; text-align: left;">
+                        ${products.slice(0, 4).map(p => `
+                            <div class="card product-card" style="transition: transform 0.2s; cursor: pointer;" onclick="window.location.hash='#/product/${p.id}'">
+                                <div style="aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-md); margin-bottom: 1rem;">
+                                    <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                </div>
+                                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${p.name}</h3>
+                                <div style="font-weight: bold; color: var(--color-accent);">$${p.price.toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="margin-top: 2rem; text-align: center;">
+                        <a href="#/products" style="color: var(--color-accent); font-weight: 500; text-decoration: none; border-bottom: 2px solid transparent; transition: all 0.2s;" onmouseover="this.style.borderBottomColor='var(--color-accent)'" onmouseout="this.style.borderBottomColor='transparent'">
+                            For more products click here →
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Franchise Opportunity Section -->
                 <div class="card" style="max-width: 800px; margin: 0 auto; padding: 2.5rem; text-align: left; border: 1px solid var(--color-bg-tertiary); background: linear-gradient(135deg, #fff 0%, #f3f4f6 100%);">
                     <div style="display: flex; flex-direction: column; md:flex-row; gap: 2rem; align-items: center;">

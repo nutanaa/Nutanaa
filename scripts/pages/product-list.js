@@ -27,11 +27,15 @@ const ProductList = async () => {
         return `
             <div class="card product-card" id="product-card-${product.id}">
                 <div class="product-image-container">
-                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <a href="#/product/${product.id}">
+                        <img src="${product.image}" alt="${product.name}" class="product-image">
+                    </a>
                 </div>
                 <div class="product-info">
                     <span class="product-category">${product.category}</span>
-                    <h3 class="product-title">${product.name}</h3>
+                    <a href="#/product/${product.id}" style="text-decoration: none; color: inherit;">
+                        <h3 class="product-title" style="cursor: pointer;">${product.name}</h3>
+                    </a>
                     <div class="product-price">$${product.price.toFixed(2)}</div>
                     ${buttonHtml}
                     <a href="#/product/${product.id}" class="view-details-link">View Details</a>

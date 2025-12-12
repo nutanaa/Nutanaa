@@ -1,4 +1,5 @@
 import { products } from '../data/products.js';
+import Store from '../store.js?v=10';
 
 const ProductDetail = async (params) => {
     const id = parseInt(params.id);
@@ -7,6 +8,54 @@ const ProductDetail = async (params) => {
     if (!product) {
         return `<h1>Product not found</h1>`;
     }
+
+    // Reactive Render Logic
+    const renderButtons = () => {
+        const qty = Store.getCartItemCount(id);
+        const container = document.getElementById('action-buttons-container');
+        if (!container) return;
+
+        if (qty > 0) {
+            container.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="btn" style="padding: 0.5rem 1rem;" onclick="Store.removeFromCart(${id})">-</button>
+                    <span style="font-size: 1.5rem; font-weight: bold;">${qty}</span>
+                    <button class="btn" style="padding: 0.5rem 1rem;" onclick="Store.addToCart(${id})">+</button>
+                </div>
+                 <button class="btn" id="toggle-3d" style="background-color: var(--color-bg-tertiary); margin-left: 1rem;">Enable 3D View</button>
+            `;
+        } else {
+            container.innerHTML = `
+                <button class="btn" onclick="Store.addToCart(${id})">Add to Cart</button>
+                 <button class="btn" id="toggle-3d" style="background-color: var(--color-bg-tertiary); margin-left: 1rem;">Enable 3D View</button>
+            `;
+        }
+
+        // Re-attach 3D toggle listener since we wiped HTML
+        attach3DListener();
+    };
+
+    const attach3DListener = () => {
+        const rotateBtn = document.getElementById('toggle-3d');
+        const img = document.querySelector('.detail-image');
+        if (rotateBtn && img) {
+            let is3D = img.style.animationName === 'rotate3d';
+            rotateBtn.textContent = is3D ? 'Disable 3D View' : 'Enable 3D View';
+
+            rotateBtn.onclick = () => {
+                is3D = !is3D;
+                if (is3D) {
+                    img.style.transition = 'transform 1s infinite linear';
+                    img.style.animation = 'rotate3d 5s infinite linear';
+                    rotateBtn.textContent = 'Disable 3D View';
+                } else {
+                    img.style.animation = 'none';
+                    img.style.transform = 'scale(1)';
+                    rotateBtn.textContent = 'Enable 3D View';
+                }
+            };
+        }
+    };
 
     // Delayed execution to attach event listeners after render
     setTimeout(() => {
@@ -25,27 +74,19 @@ const ProductDetail = async (params) => {
             });
 
             container.addEventListener('mouseleave', () => {
-                img.style.transform = 'scale(1)';
-                img.style.transformOrigin = 'center center';
-            });
-
-            // 3D Rotation Effect (Toggle)
-            const rotateBtn = document.getElementById('toggle-3d');
-            let is3D = false;
-
-            rotateBtn.addEventListener('click', () => {
-                is3D = !is3D;
-                if (is3D) {
-                    img.style.transition = 'transform 1s infinite linear';
-                    img.style.animation = 'rotate3d 5s infinite linear';
-                    rotateBtn.textContent = 'Disable 3D View';
-                } else {
-                    img.style.animation = 'none';
-                    img.style.transform = 'scale(1)'; // reset
-                    rotateBtn.textContent = 'Enable 3D View';
+                if (img.style.animationName !== 'rotate3d') {
+                    img.style.transform = 'scale(1)';
+                    img.style.transformOrigin = 'center center';
                 }
             });
         }
+
+        // Initial button render
+        renderButtons();
+
+        // Listen for updates
+        window.addEventListener('cart-updated', renderButtons);
+
     }, 100);
 
     return `
@@ -96,6 +137,7 @@ const ProductDetail = async (params) => {
             .action-buttons {
                 display: flex;
                 gap: 1rem;
+                align-items: center;
             }
         </style>
 
@@ -113,16 +155,9 @@ const ProductDetail = async (params) => {
                 <div class="detail-price">$${product.price.toFixed(2)}</div>
                 <p class="detail-desc">${product.description}</p>
                 
-                <div class="action-buttons">
-                    <button class="btn" onclick="const e = new CustomEvent('add-to-cart', { detail: ${product.id} }); window.dispatchEvent(e);">
-                        Add to Cart
-                    </button>
-                     <button class="btn" id="toggle-3d" style="background-color: var(--color-bg-tertiary);">
-                        Enable 3D View
-                    </button>
-                    <button class="btn" style="background-color: transparent; border: 1px solid var(--color-bg-tertiary);">
-                        Add to Wishlist
-                    </button>
+                <div class="action-buttons" id="action-buttons-container">
+                    <!-- Buttons rendered via JS -->
+                     <button class="btn">Loading...</button>
                 </div>
             </div>
         </div>
