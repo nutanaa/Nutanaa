@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Shop & Admin</title>
+    <link rel="stylesheet" href="styles/main.css?v=3">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+
+<body style="background-color: #f8fafc; color: #1e293b;">
+    <div id="debug-log"
+        style="position: fixed; top: 0; left: 0; width: 100%; background: #330000; color: #ffcccc; padding: 10px; z-index: 9999; display: none; white-space: pre-wrap; font-family: monospace;">
+    </div>
+    <script>
+        window.onerror = function (msg, url, line, col, error) {
+            const el = document.getElementById('debug-log');
+            if (el) {
+                el.style.display = 'block';
+                el.innerText += `Error: ${msg}\nAt: ${url}:${line}:${col}\n\n`;
+            }
+            return false; // Prevent default error handling
+        };
+        window.addEventListener('unhandledrejection', function (event) {
+            const el = document.getElementById('debug-log');
+            if (el) {
+                el.style.display = 'block';
+                el.innerText += `Promise Rejection: ${event.reason}\n\n`;
+            }
+        });
+    </script>
+    <div id="app">
+        <!-- App content will be injected here by Router -->
+        <div id="layout-container">
+            <header id="main-header"></header>
+            <main id="main-content">
+                <h1 style="text-align: center; margin-top: 20%; color: var(--color-text-primary);">Loading
+                    Application...
+                </h1>
+            </main>
+        </div>
+    </div>
+    <script>
+        // Dynamic import to handle errors gracefully
+        import('./scripts/app.js?v=12').then(module => {
+            module.initApp();
+        }).catch(err => {
+            console.error('Failed to load app:', err);
+            document.body.innerHTML += `<div style="color:red; padding:2rem;">CRITICAL FAILURE: Failed to load application. <br> ${err.message}</div>`;
+        });
+    </script>
+</body>
+
+</html>
