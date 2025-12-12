@@ -1,4 +1,4 @@
-import Store from '../store.js?v=4';
+import Store from '../store.js?v=10';
 
 const Login = async () => {
     // Login Handler
@@ -10,6 +10,7 @@ const Login = async () => {
 
             let role = null;
             let name = "User";
+            let permissions = [];
 
             // Mock Authentication Logic
             if (email === 'admin@nutanaa.com' && password === 'admin') {
@@ -18,6 +19,7 @@ const Login = async () => {
             } else if (email === 'franchisee@nutanaa.com' && password === 'franchisee') {
                 role = 'franchisee';
                 name = 'Franchise Owner';
+                permissions = ['register_franchise']; // Grant permission explicitly
             } else if (email === 'user@nutanaa.com' && password === 'user') {
                 role = 'user';
                 name = 'Customer';
@@ -26,15 +28,17 @@ const Login = async () => {
                 return;
             }
 
-            // Save to Store
-            import('../store.js?v=4').then(module => {
-                module.default.setUser({ name, role });
+            // Save to Store - Use Global window.Store to ensure we share state with Router/Header
+            const appStore = window.Store || Store;
+            appStore.setUser({ name, role, permissions });
 
+            // Force a small delay to ensure state propagation before routing
+            setTimeout(() => {
                 // Redirect based on role
                 if (role === 'admin') window.location.hash = '#/admin';
-                else if (role === 'franchisee') window.location.hash = '#/admin/orders'; // Franchisee landing
+                else if (role === 'franchisee') window.location.hash = '#/';
                 else window.location.hash = '#/';
-            });
+            }, 50);
         };
     }, 100);
 

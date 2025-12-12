@@ -1,16 +1,17 @@
-import Home from './pages/home.js';
-import ProductList from './pages/product-list.js';
-import ProductDetail from './pages/product-detail.js';
-import AdminDashboard from './pages/admin/dashboard.js';
-import AdminProducts from './pages/admin/products.js';
-import AdminKYC from './pages/admin/kyc.js';
-import Cart from './pages/cart.js';
-import Login from './pages/login.js';
-import About from './pages/about.js';
-import Contact from './pages/contact.js';
-import FranchiseEnquiry from './pages/franchise-enquiry.js';
-import FranchiseRegister from './pages/franchise-register.js';
-import Store from './store.js?v=10';
+import Home from './pages/home.js?v=42';
+import ProductList from './pages/product-list.js?v=42';
+import ProductDetail from './pages/product-detail.js?v=42';
+import AdminDashboard from './pages/admin/dashboard.js?v=42';
+import AdminProducts from './pages/admin/products.js?v=42';
+import AdminKYC from './pages/admin/kyc.js?v=42';
+import Cart from './pages/cart.js?v=42';
+import Login from './pages/login.js?v=42';
+import About from './pages/about.js?v=42';
+import Contact from './pages/contact.js?v=42';
+import FranchiseEnquiry from './pages/enquiry-form.js?v=42';
+import FranchiseRegister from './pages/franchise-register.js?v=42';
+import Profile from './pages/profile.js?v=42';
+import Store from './store.js?v=42';
 
 const Router = {
     routes: {
@@ -21,6 +22,7 @@ const Router = {
         '/login': Login,
         '/about': About,
         '/contact': Contact,
+        '/profile': Profile,
         '/franchise-enquiry': FranchiseEnquiry,
         '/franchise-register': FranchiseRegister,
         '/admin': AdminDashboard,
@@ -94,7 +96,10 @@ const Router = {
 
         // Security Check for Admin
         if (path.startsWith('/admin')) {
-            const user = Store.getUser();
+            const currentStore = window.Store || Store;
+            const user = currentStore.getUser();
+            console.log('Router checking admin access for:', user);
+
             if (!user || user.role !== 'admin') {
                 alert('Access Denied: Admin Rights Required');
                 window.location.hash = '#/login';

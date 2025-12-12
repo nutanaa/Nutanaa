@@ -25,6 +25,13 @@ export const initApp = () => {
             if (h) h.innerHTML = renderHeader();
         });
 
+        // Listen for User Updates
+        window.addEventListener('user-updated', () => {
+            const h = document.getElementById('main-header');
+            if (h) h.innerHTML = renderHeader();
+            console.log('Header updated due to user change');
+        });
+
         // Initial Footer Render
         const layout = document.getElementById('layout-container');
         if (layout) {
