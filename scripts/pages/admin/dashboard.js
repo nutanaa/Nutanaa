@@ -1,4 +1,5 @@
 import AdminSidebar from '../../components/admin-sidebar.js';
+import Store from '../../store.js?v=51';
 
 const AdminDashboard = async () => {
     // Delayed Chart Rendering
