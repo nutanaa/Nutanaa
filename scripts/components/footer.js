@@ -12,7 +12,7 @@ const Footer = () => {
                     <h4 style="margin-bottom: 1rem;">Quick Links</h4>
                     <ul style="display: flex; flex-direction: column; gap: 0.5rem; color: var(--color-text-secondary); font-size: 0.9rem;">
                         <li><a href="#/" style="color: inherit;">Home</a></li>
-                        <li><a href="#/products" style="color: inherit;">Shop</a></li>
+                        <li><a href="#/products" style="color: inherit;">Products</a></li>
                         <li><a href="#/cart" style="color: inherit;">Cart</a></li>
                         <li><a href="#/login" style="color: inherit;">Login / Admin</a></li>
                     </ul>

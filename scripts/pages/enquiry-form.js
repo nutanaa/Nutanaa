@@ -42,7 +42,6 @@ const FranchiseEnquiry = () => {
 
                     <button type="submit" class="btn" style="justify-content: center; margin-top: 1rem;">Submit Enquiry</button>
                     
-
                 </form>
             </div>
         </div>
