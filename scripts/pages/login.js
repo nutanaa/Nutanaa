@@ -8,37 +8,21 @@ const Login = async () => {
             const email = document.getElementById('email').value.toLowerCase();
             const password = document.getElementById('password').value;
 
-            let role = null;
-            let name = "User";
-            let permissions = [];
-
-            // Mock Authentication Logic
-            if (email === 'admin@nutanaa.com' && password === 'admin') {
-                role = 'admin';
-                name = 'Admin Manager';
-            } else if (email === 'franchisee@nutanaa.com' && password === 'franchisee') {
-                role = 'franchisee';
-                name = 'Franchise Owner';
-                permissions = ['register_franchise']; // Grant permission explicitly
-            } else if (email === 'user@nutanaa.com' && password === 'user') {
-                role = 'user';
-                name = 'Customer';
-            } else {
-                alert('Invalid Credentials! Try admin@nutanaa.com / admin');
-                return;
-            }
-
             // Save to Store - Use Global window.Store to ensure we share state with Router/Header
             const appStore = window.Store || Store;
-            appStore.setUser({ name, role, permissions });
 
-            // Force a small delay to ensure state propagation before routing
-            setTimeout(() => {
-                // Redirect based on role
-                if (role === 'admin') window.location.hash = '#/admin';
-                else if (role === 'franchisee') window.location.hash = '#/';
-                else window.location.hash = '#/';
-            }, 50);
+            if (appStore.authenticate(email, password)) {
+                const user = appStore.getUser();
+                // Force a small delay to ensure state propagation before routing
+                setTimeout(() => {
+                    // Redirect based on role
+                    if (user.role === 'admin') window.location.hash = '#/admin';
+                    else if (user.role === 'franchisee') window.location.hash = '#/';
+                    else window.location.hash = '#/';
+                }, 50);
+            } else {
+                alert('Invalid Credentials! Try:\n- Admin: admin@nutanaa.com / admin\n- Franchisee: franchisee@nutanaa.com / franchisee\n- User: user@nutanaa.com / user');
+            }
         };
     }, 100);
 
@@ -62,8 +46,9 @@ const Login = async () => {
                     <button type="submit" class="btn" style="width: 100%; padding: 1rem;">Sign In</button>
                     
                     <div style="font-size: 0.8rem; color: var(--color-text-secondary); background: var(--color-bg-primary); padding: 1rem; border-radius: var(--radius-sm);">
-                        <strong>Credentials:</strong><br>
+                        <strong>Test Credentials:</strong><br>
                         Admin: admin@nutanaa.com / admin<br>
+                        Franchisee: franchisee@nutanaa.com / franchisee<br>
                         User: user@nutanaa.com / user
                     </div>
                 </form>

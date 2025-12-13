@@ -1,9 +1,11 @@
 import Home from './pages/home.js?v=42';
 import ProductList from './pages/product-list.js?v=42';
 import ProductDetail from './pages/product-detail.js?v=42';
-import AdminDashboard from './pages/admin/dashboard.js?v=42';
+import AdminDashboard from './pages/admin/dashboard.js?v=51';
 import AdminProducts from './pages/admin/products.js?v=42';
 import AdminKYC from './pages/admin/kyc.js?v=42';
+import AdminUsers from './pages/admin/users.js?v=49';
+import AdminOrders from './pages/admin/orders.js?v=50';
 import Cart from './pages/cart.js?v=42';
 import Login from './pages/login.js?v=42';
 import About from './pages/about.js?v=42';
@@ -11,7 +13,7 @@ import Contact from './pages/contact.js?v=42';
 import FranchiseEnquiry from './pages/enquiry-form.js?v=42';
 import FranchiseRegister from './pages/franchise-register.js?v=42';
 import Profile from './pages/profile.js?v=42';
-import Store from './store.js?v=42';
+import Store from './store.js?v=51';
 
 const Router = {
     routes: {
@@ -28,8 +30,8 @@ const Router = {
         '/admin': AdminDashboard,
         '/admin/products': AdminProducts,
         '/admin/kyc': AdminKYC,
-        // Add more routes here dynamically or statically
-        // '/admin': AdminDashboard,
+        '/admin/users': AdminUsers,
+        '/admin/orders': AdminOrders
     },
 
     init() {
@@ -109,12 +111,15 @@ const Router = {
 
         // Security Check for Franchise Registration
         if (path === '/franchise-register') {
-            // Check usage of the new helper, or fallback to direct check if store update isn't hot yet
-            const hasAccess = Store.hasPermission ? Store.hasPermission('register_franchise') : (Store.getUser() && Store.getUser().role === 'admin');
+            const currentStore = window.Store || Store;
+            const hasAccess = currentStore.hasPermission && currentStore.hasPermission('register_franchise');
 
-            if (!hasAccess) {
+            // Allow admin too
+            const isAdmin = currentStore.getUser() && currentStore.getUser().role === 'admin';
+
+            if (!hasAccess && !isAdmin) {
                 alert('Access Denied: You need permission to access Franchise Registration.\nPlease contact Administrator.');
-                window.location.hash = '#/'; // Redirect to home
+                window.location.hash = '#/';
                 return;
             }
         }
