@@ -96,6 +96,7 @@ const Store = {
         } else {
             localStorage.removeItem('user');
         }
+        window.dispatchEvent(new CustomEvent('user-updated'));
     },
 
     // Check specific permission or role
@@ -106,8 +107,94 @@ const Store = {
         return user.permissions && user.permissions.includes(permission);
     },
 
+    // Mock Orders Data
+    orders: [
+        { id: 'ORD-1001', userId: 'user@nutanaa.com', date: '2025-10-15', total: 299.99, status: 'Delivered', items: [{ id: 2, name: 'Quantum Noise-Canceling Headphones', price: 299.99 }] },
+        { id: 'ORD-1002', userId: 'user@nutanaa.com', date: '2025-11-20', total: 899.50, status: 'Shipped', items: [{ id: 3, name: 'ErgoChair Elite', price: 450.00 }, { id: 2, name: 'Quantum Noise-Canceling Headphones', price: 199.50 }, { id: 6, name: 'SonicSound Bar', price: 150.00 }] },
+        { id: 'ORD-1003', userId: 'user@nutanaa.com', date: '2025-12-10', total: 129.99, status: 'Processing', items: [{ id: 1, name: 'Nebula Smart Watch', price: 299.99 }] },
+        { id: 'ORD-1004', userId: 'franchisee@nutanaa.com', date: '2025-12-05', total: 5000.00, status: 'Processing', items: [{ id: 4, name: 'Bulk Order: HoloLens Pro', price: 5000.00 }] }
+    ],
+
     getUser() {
         return this.state.currentUser;
+    },
+
+    // --- Profile & Order Methods ---
+
+    getOrders(email) {
+        // Filter orders by user email (using email as ID for simplicity)
+        return this.orders.filter(o => o.userId === email);
+    },
+
+    cancelOrder(orderId) {
+        const order = this.orders.find(o => o.id === orderId);
+        if (order && order.status === 'Processing') {
+            order.status = 'Cancelled';
+            this.notifyOrderChange(); // Notify listeners to re-render
+            return true;
+        }
+        return false;
+    },
+
+    returnOrder(orderId) {
+        const order = this.orders.find(o => o.id === orderId);
+        if (order && order.status === 'Delivered') {
+            order.status = 'Returned';
+            this.notifyOrderChange();
+            return true;
+        }
+        return false;
+    },
+
+    updateProfile(data) {
+        if (this.state.currentUser) {
+            this.state.currentUser = { ...this.state.currentUser, ...data };
+            this.setUser(this.state.currentUser); // Persist
+            return true;
+        }
+        return false;
+    },
+
+    notifyOrderChange() {
+        window.dispatchEvent(new CustomEvent('orders-updated'));
+    },
+
+    // --- Address Methods ---
+
+    // Mock Addresses (loaded from local storage or defaults)
+    addresses: JSON.parse(localStorage.getItem('addresses')) || [
+        { id: 'ADDR-1', userId: 'user@nutanaa.com', type: 'Home', address: '123 Tech Boulevard, Silicon Valley, CA, 94000', lat: 37.7749, lng: -122.4194 },
+        { id: 'ADDR-2', userId: 'user@nutanaa.com', type: 'Work', address: '456 Innovation Way, San Francisco, CA, 94016', lat: 37.7833, lng: -122.4167 }
+    ],
+
+    getAddresses(email) {
+        return this.addresses.filter(a => a.userId === email);
+    },
+
+    addAddress(addressData) {
+        const newAddress = {
+            id: 'ADDR-' + Date.now(),
+            ...addressData
+        };
+        this.addresses.push(newAddress);
+        this.saveAddresses();
+        this.notifyAddressChange();
+        return true;
+    },
+
+    removeAddress(id) {
+        this.addresses = this.addresses.filter(a => a.id !== id);
+        this.saveAddresses();
+        this.notifyAddressChange();
+        return true;
+    },
+
+    saveAddresses() {
+        localStorage.setItem('addresses', JSON.stringify(this.addresses));
+    },
+
+    notifyAddressChange() {
+        window.dispatchEvent(new CustomEvent('addresses-updated'));
     }
 };
 

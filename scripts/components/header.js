@@ -1,8 +1,9 @@
 import Store from '../store.js?v=10';
 
 const renderHeader = () => {
-    const user = Store.getUser();
-    const cartCount = Store.getCart().reduce((acc, item) => acc + item.quantity, 0);
+    const currentStore = window.Store || Store;
+    const user = currentStore.getUser();
+    const cartCount = currentStore.getCart().reduce((acc, item) => acc + item.quantity, 0);
 
     return `
         <header style="
@@ -37,11 +38,18 @@ const renderHeader = () => {
                 ${user && user.role === 'admin' ? '<a href="#/admin" class="nav-link" style="color: var(--color-danger); font-weight: bold;">Admin Panel</a>' : ''}
             </nav>
             
-            <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <div style="display: flex; gap: 1rem; align-items: center;">
                 <a href="#/cart" style="position: relative; color: var(--color-text-primary); text-decoration: none; display: flex; align-items: center;">
-                    <span style="font-size: 1.25rem;">🛍️</span> 
+                    <span style="font-size: 1.25rem;">🛒</span> 
                     ${cartCount > 0 ? `<span style="position: absolute; top: -8px; right: -8px; background: var(--color-accent); color: white; font-size: 0.7rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">${cartCount}</span>` : ''}
                 </a>
+                ${user ?
+            `<a href="#/profile" title="My Profile" style="color: var(--color-text-primary); text-decoration: none; display: flex; align-items: center; justify-content: center; width: 35px; height: 35px; border-radius: 50%; background: var(--color-bg-secondary); transition: background 0.2s;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                    </a>` : ''}
                 ${user ?
             `<button class="btn" style="padding: 0.35rem 1rem; font-size: 0.9rem; border-radius: 50px;" onclick="localStorage.removeItem('user'); window.location.reload();">Logout</button>` :
             `<a href="#/login" class="btn" style="padding: 0.35rem 1rem; font-size: 0.9rem; border-radius: 50px;">Login</a>`
