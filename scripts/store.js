@@ -5,18 +5,42 @@ const Store = {
         currentUser: null, // { id, name, role }
         cart: [],
         isAuthenticated: false,
-        products: products // Initialize immediately
+        products: [],
+        categories: ['Electronics', 'Audio', 'Furniture', 'Accessories'] // Default categories
     },
 
     init() {
         // Expose globally for inline handlers
         window.Store = this;
 
+        // Load Products
+        const savedProducts = localStorage.getItem('products');
+        if (savedProducts) {
+            this.state.products = JSON.parse(savedProducts);
+        } else {
+            this.state.products = products; // from data file
+        }
+
+        // Load Categories
+        const savedCategories = localStorage.getItem('categories');
+        if (savedCategories) {
+            this.state.categories = JSON.parse(savedCategories);
+        }
+
+        // Load Users from local storage or Default Mock
+        // We persist the ENTIRE user database to allow admin updates to stick
+        const savedUsers = localStorage.getItem('users_db');
+        if (savedUsers) {
+            this.users = JSON.parse(savedUsers);
+        }
+
         // Load from local storage if available
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
             this.state.currentUser = JSON.parse(savedUser);
             this.state.isAuthenticated = true;
+            // Re-sync with DB to get latest permissions
+            this.syncCurrentUser();
         }
 
         // Load Cart from local storage
@@ -26,6 +50,7 @@ const Store = {
             // Notify immediately to update header on load
             setTimeout(() => this.notifyCartChange('init'), 100);
         }
+        // ... existing code ...
 
         // Cart Event Listeners
         window.addEventListener('add-to-cart', (e) => {
@@ -33,6 +58,105 @@ const Store = {
         });
     },
 
+    // --- Product Management ---
+
+    getProductPrice(product) {
+        if (this.state.currentUser && this.state.currentUser.role === 'franchisee' && product.franchisePrice) {
+            return product.franchisePrice;
+        }
+        return product.price;
+    },
+
+    addProduct(productData) {
+        const newProduct = {
+            id: Date.now(), // Simple ID generation
+            ...productData
+        };
+        this.state.products.push(newProduct);
+        this.saveProducts();
+        return true;
+    },
+
+    saveProducts() {
+        localStorage.setItem('products', JSON.stringify(this.state.products));
+    },
+
+    addCategory(category) {
+        if (!this.state.categories.includes(category)) {
+            this.state.categories.push(category);
+            localStorage.setItem('categories', JSON.stringify(this.state.categories));
+            return true;
+        }
+        return false;
+    },
+
+    // --- User Management Database ---
+    users: [
+        { id: 1, name: 'Admin Manager', email: 'admin@nutanaa.com', password: 'admin', role: 'admin', permissions: [] },
+        { id: 2, name: 'Franchise Owner', email: 'franchisee@nutanaa.com', password: 'franchisee', role: 'franchisee', permissions: [] },
+        { id: 3, name: 'Customer', email: 'user@nutanaa.com', password: 'user', role: 'user', permissions: [] },
+        // Add a test user for demo
+        { id: 4, name: 'Prospective Franchisee', email: 'prospect@nutanaa.com', password: 'user', role: 'user', permissions: [] }
+    ],
+
+    saveUsers() {
+        localStorage.setItem('users_db', JSON.stringify(this.users));
+    },
+
+    authenticate(email, password) {
+        const user = this.users.find(u => u.email === email && u.password === password);
+        if (user) {
+            this.setUser(user);
+            return true;
+        }
+        return false;
+    },
+
+    syncCurrentUser() {
+        if (this.state.currentUser) {
+            const dbUser = this.users.find(u => u.email === this.state.currentUser.email);
+            if (dbUser) {
+                this.state.currentUser = dbUser; // Update session with latest DB state
+                localStorage.setItem('user', JSON.stringify(dbUser));
+            }
+        }
+    },
+
+    grantPermission(email, permission) {
+        const user = this.users.find(u => u.email === email);
+        if (user) {
+            if (!user.permissions) user.permissions = [];
+            if (!user.permissions.includes(permission)) {
+                user.permissions.push(permission);
+                this.saveUsers();
+                // If it's the current user, update session immediately
+                if (this.state.currentUser && this.state.currentUser.email === email) {
+                    this.syncCurrentUser();
+                }
+                return true;
+            }
+        }
+        return false;
+    },
+
+    revokePermission(email, permission) {
+        const user = this.users.find(u => u.email === email);
+        if (user && user.permissions) {
+            user.permissions = user.permissions.filter(p => p !== permission);
+            this.saveUsers();
+            if (this.state.currentUser && this.state.currentUser.email === email) {
+                this.syncCurrentUser();
+            }
+            return true;
+        }
+        return false;
+    },
+
+    getAllUsers() {
+        return this.users;
+    },
+
+    // --- Cart Methods ---
     addToCart(productId) {
         console.log('Adding to cart:', productId);
         const product = this.state.products.find(p => p.id === productId);
@@ -122,6 +246,7 @@ const Store = {
     // --- Profile & Order Methods ---
 
     getOrders(email) {
+        if (email === 'all') return this.orders;
         // Filter orders by user email (using email as ID for simplicity)
         return this.orders.filter(o => o.userId === email);
     },
@@ -195,6 +320,18 @@ const Store = {
 
     notifyAddressChange() {
         window.dispatchEvent(new CustomEvent('addresses-updated'));
+    },
+
+    // --- Franchise Documents (Mock) ---
+    franchiseDocuments: [
+        { userId: 'franchisee@nutanaa.com', type: 'Aadhar Card', status: 'Verified', url: '#', uploadedAt: '2025-12-01' },
+        { userId: 'franchisee@nutanaa.com', type: 'PAN Card', status: 'Verified', url: '#', uploadedAt: '2025-12-01' },
+        { userId: 'franchisee@nutanaa.com', type: 'Store Photo (Exterior)', status: 'Pending', url: '#', uploadedAt: '2025-12-05' },
+        { userId: 'franchisee@nutanaa.com', type: 'Store Photo (Interior)', status: 'Pending', url: '#', uploadedAt: '2025-12-05' }
+    ],
+
+    getFranchiseDocuments(email) {
+        return this.franchiseDocuments.filter(d => d.userId === email);
     }
 };
 

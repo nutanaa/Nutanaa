@@ -3,11 +3,15 @@ import Store from '../store.js?v=10';
 
 const ProductDetail = async (params) => {
     const id = parseInt(params.id);
-    const product = products.find(p => p.id === id);
+    // Use Store.state.products to ensure we find dynamically added products
+    const product = Store.state.products.find(p => p.id === id);
 
     if (!product) {
         return `<h1>Product not found</h1>`;
     }
+
+    const displayPrice = Store.getProductPrice(product);
+    const isFranchisee = Store.getUser() && Store.getUser().role === 'franchisee';
 
     // Reactive Render Logic
     const renderButtons = () => {
@@ -15,7 +19,24 @@ const ProductDetail = async (params) => {
         const container = document.getElementById('action-buttons-container');
         if (!container) return;
 
-        if (qty > 0) {
+        // Expiry Logic
+        let isExpired = false;
+        if (product.expiryDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const expDate = new Date(product.expiryDate);
+            if (expDate < today) {
+                isExpired = true;
+            }
+        }
+
+        if (isExpired) {
+            container.innerHTML = `
+                <button class="btn" disabled style="background-color: var(--color-text-secondary); cursor: not-allowed; opacity: 0.7; width: 100%;">
+                    Expired
+                </button>
+            `;
+        } else if (qty > 0) {
             container.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <button class="btn" style="padding: 0.5rem 1rem;" onclick="Store.removeFromCart(${id})">-</button>
@@ -31,8 +52,10 @@ const ProductDetail = async (params) => {
             `;
         }
 
-        // Re-attach 3D toggle listener since we wiped HTML
-        attach3DListener();
+        if (!isExpired) {
+            // Re-attach 3D toggle listener since we wiped HTML
+            attach3DListener();
+        }
     };
 
     const attach3DListener = () => {
@@ -152,7 +175,10 @@ const ProductDetail = async (params) => {
             
             <div class="detail-info">
                 <h1>${product.name}</h1>
-                <div class="detail-price">$${product.price.toFixed(2)}</div>
+                <div class="detail-price">
+                    $${displayPrice.toFixed(2)}
+                    ${isFranchisee && product.franchisePrice < product.price ? `<span style="font-size: 1.2rem; text-decoration: line-through; color: var(--color-text-secondary); margin-left: 1rem;">$${product.price.toFixed(2)}</span> <span style="font-size: 1rem; background: var(--color-success); color: white; padding: 4px 8px; border-radius: 4px; vertical-align: middle;">Wholesale</span>` : ''}
+                </div>
                 <p class="detail-desc">${product.description}</p>
                 
                 <div class="action-buttons" id="action-buttons-container">

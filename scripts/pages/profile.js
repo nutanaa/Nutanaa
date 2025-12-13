@@ -211,6 +211,11 @@ const Profile = async () => {
                          style="padding: 1rem; cursor: pointer;">
                         💳 Payment Methods
                     </div>
+                    ${user.role === 'franchisee' ? `
+                    <div class="tab-btn" data-tab="tab-docs" onclick="window.switchTab('tab-docs')" 
+                         style="padding: 1rem; cursor: pointer; border-top: 1px solid var(--color-bg-tertiary);">
+                        📄 Franchise Docs
+                    </div>` : ''}
                 </div>
 
                 <!-- Content Area -->
@@ -295,6 +300,32 @@ const Profile = async () => {
                              </div>
                         </div>
                     </div>
+
+                    <!-- Franchise Docs Tab -->
+                    ${user.role === 'franchisee' ? `
+                    <div id="tab-docs" class="tab-content" style="display: none;">
+                        <div class="card" style="padding: 2rem;">
+                            <h2 style="margin-bottom: 1.5rem;">Franchise Documents</h2>
+                            <p style="color: var(--color-text-secondary); margin-bottom: 2rem;">Managed by Nutanaa Admin Team</p>
+                            
+                            <div style="display: grid; gap: 1rem;">
+                                ${Store.getFranchiseDocuments(user.email).map(doc => `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border: 1px solid var(--color-bg-tertiary); border-radius: var(--radius-sm);">
+                                        <div>
+                                            <strong>${doc.type}</strong><br>
+                                            <span style="font-size: 0.85rem; color: var(--color-text-secondary);">Uploaded: ${doc.uploadedAt}</span>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.85rem; font-weight: 500; background: ${doc.status === 'Verified' ? '#dcfce7' : '#fef9c3'}; color: ${doc.status === 'Verified' ? '#166534' : '#854d0e'}; margin-bottom: 0.5rem;">
+                                                ${doc.status}
+                                            </span><br>
+                                            <a href="${doc.url}" style="color: var(--color-accent); font-size: 0.9rem;">View Document</a>
+                                        </div>
+                                    </div>
+                                `).join('') || '<p>No documents found.</p>'}
+                            </div>
+                        </div>
+                    </div>` : ''}
 
                 </div>
             </div>
