@@ -1,19 +1,27 @@
-import Home from './pages/home.js?v=42';
-import ProductList from './pages/product-list.js?v=42';
-import ProductDetail from './pages/product-detail.js?v=42';
-import AdminDashboard from './pages/admin/dashboard.js?v=51';
-import AdminProducts from './pages/admin/products.js?v=42';
-import AdminKYC from './pages/admin/kyc.js?v=42';
-import AdminUsers from './pages/admin/users.js?v=49';
-import AdminOrders from './pages/admin/orders.js?v=50';
-import Cart from './pages/cart.js?v=42';
-import Login from './pages/login.js?v=42';
-import About from './pages/about.js?v=42';
-import Contact from './pages/contact.js?v=42';
-import FranchiseEnquiry from './pages/enquiry-form.js?v=42';
-import FranchiseRegister from './pages/franchise-register.js?v=42';
-import Profile from './pages/profile.js?v=42';
-import Store from './store.js?v=51';
+import Home from './pages/home.js?v=72';
+import ProductList from './pages/product-list.js?v=72';
+import ProductDetail from './pages/product-detail.js?v=72';
+import AdminDashboard from './pages/admin/dashboard.js?v=72';
+import AdminProducts from './pages/admin/products.js?v=76';
+import AdminFranchise from './pages/admin/franchise.js?v=72';
+import AdminUsers from './pages/admin/users.js?v=72';
+import AdminOrders from './pages/admin/orders.js?v=77';
+import AdminVendors from './pages/admin/vendors.js?v=74';
+import AdminLogs from './pages/admin/logs.js?v=72';
+import AdminReviews from './pages/admin/reviews.js?v=76';
+import AdminMarketing from './pages/admin/marketing.js?v=76';
+import AdminCMS from './pages/admin/cms.js?v=76';
+import AdminAnalytics from './pages/admin/analytics.js?v=76';
+import AdminSettings from './pages/admin/settings.js?v=76';
+import AdminSupport from './pages/admin/support.js?v=76';
+import Cart from './pages/cart.js?v=72';
+import Login from './pages/login.js?v=72';
+import About from './pages/about.js?v=72';
+import Contact from './pages/contact.js?v=72';
+import FranchiseEnquiry from './pages/enquiry-form.js?v=72';
+import FranchiseRegister from './pages/franchise-register.js?v=72';
+import Profile from './pages/profile.js?v=72';
+import Store from './store.js?v=76';
 
 const Router = {
     routes: {
@@ -29,9 +37,17 @@ const Router = {
         '/franchise-register': FranchiseRegister,
         '/admin': AdminDashboard,
         '/admin/products': AdminProducts,
-        '/admin/kyc': AdminKYC,
+        '/admin/partners': AdminFranchise,
         '/admin/users': AdminUsers,
-        '/admin/orders': AdminOrders
+        '/admin/orders': AdminOrders,
+        '/admin/vendors': AdminVendors,
+        '/admin/reviews': AdminReviews,
+        '/admin/marketing': AdminMarketing,
+        '/admin/cms': AdminCMS,
+        '/admin/reports': AdminAnalytics,
+        '/admin/settings': AdminSettings,
+        '/admin/support': AdminSupport,
+        '/admin/logs': AdminLogs
     },
 
     init() {
@@ -102,7 +118,9 @@ const Router = {
             const user = currentStore.getUser();
             console.log('Router checking admin access for:', user);
 
-            if (!user || user.role !== 'admin') {
+            const allowedRoles = ['admin', 'sub-admin', 'vendor', 'support', 'finance'];
+
+            if (!user || !allowedRoles.includes(user.role)) {
                 alert('Access Denied: Admin Rights Required');
                 window.location.hash = '#/login';
                 return;
